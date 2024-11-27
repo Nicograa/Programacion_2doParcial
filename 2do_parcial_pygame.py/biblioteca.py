@@ -1,8 +1,6 @@
 import pygame
 import sys 
 import random
-
-
 #tamaño de pantalla
 ANCHO = 800
 ALTO = 600
@@ -19,35 +17,19 @@ COLOR_BOTONES = (165, 198, 250)
 ACERTADO = (0, 255, 0)  
 FALLADO = (255, 0, 0)  
 
-TAMANIO_CASILLA = 45
 FILAS = 10
 COLUMNAS = 10
+TAMANIO_CASILLA = 500// FILAS
 
 #carga de imagenes
-imagen_oceano = pygame.image.load("2do_parcial_pygame.py/imagenes/oceano.jpg")
-imagen_menu = pygame.image.load("2do_parcial_pygame.py/imagenes/imagen_menu.jpg")
-imagen_icono = pygame.image.load("2do_parcial_pygame.py/imagenes/imagen_icono.jpg")
-imagen_acierto = pygame.image.load("2do_parcial_pygame.py\imagenes\explosion.png")
+imagen_oceano = pygame.image.load("imagenes\oceano.jpg")
+imagen_menu = pygame.image.load("imagenes\imagen_menu.jpg")
+imagen_icono = pygame.image.load("imagenes\imagen_icono.jpg")
+imagen_acierto = pygame.image.load("imagenes\explosion.png")
 
 imagen_acierto = pygame.transform.scale(imagen_acierto, (TAMANIO_CASILLA, TAMANIO_CASILLA))
 imagen_menu_agrandada = pygame.transform.scale(imagen_menu, (800, 600))
 imagen_oceano_agrandada = pygame.transform.scale(imagen_oceano, (800, 600))
-
-
-
-
-def definir_dificultad(dificultad):
-    if dificultad == "facil":
-        filas, columnas = 10, 10
-        tamanio_casilla = 45
-    elif dificultad == "normal":
-        filas, columnas = 20, 20
-        tamanio_casilla = 30  # Reducimos el tamaño de las casillas
-    elif dificultad == "dificil":
-        filas, columnas = 40, 40
-        tamanio_casilla = 15  # Reducimos aún más el tamaño de las casillas
-    return filas, columnas, tamanio_casilla
-
 
 
 def inicializar_matriz(filas:int, columnas:int)->list:
@@ -68,22 +50,19 @@ def chequear_casillas_disponibles(matriz, x, y, longitud_barco, orientacion):
     ni que haya otro barcoen las casillas
 
     '''
-    
-    
-    
     retorno = True
     if orientacion == 'horizontal':
-        if y + longitud_barco > 10:  # que no se pase de la grilla
+        if y + longitud_barco > 10:  # Verificar que el barco no se pase de los límites
             retorno = False
-        # que no haya otro barco
+        # Verificar que no haya otros barcos en el camino
         for i in range(longitud_barco):
             if y + i >=10 or matriz[x][y + i] != 0:
                 retorno = False
                 break
     elif orientacion == 'vertical':
-        if x + longitud_barco > 10:  # que no se pase de la grilla
+        if x + longitud_barco > 10:  # Verificar que el barco no se pase de los límites
             retorno = False
-        # que no haya otro barco
+        # Verificar que no haya otros barcos en el camino
         for i in range(longitud_barco):
             if x + i >= 10 or matriz[x + i][y] != 0:
                 retorno = False
@@ -91,19 +70,25 @@ def chequear_casillas_disponibles(matriz, x, y, longitud_barco, orientacion):
     
     return retorno
 
-def colocar_barco(matriz, longitud_barco):
+def colocar_barco(matriz, longitud_barco, dificultad):
     """
     coloca un barco de longitud específica en el tablero en una posicion y orientacion aleatoria
     si no hay otro barco
     """
-   
     orientaciones = ['horizontal', 'vertical']
     while True:
-        x = random.randint(0, 9)  
-        y = random.randint(0, 9)  
-        orientacion = random.choice(orientaciones)  # Elige una orientación aleatori
+        if dificultad == "facil":
+            x = random.randint(0, 9) 
+            y = random.randint(0, 9) 
+        elif dificultad == "normal":
+            x = random.randint(0, 19) 
+            y = random.randint(0, 19) 
+        elif dificultad == "dificil":
+            x = random.randint(0, 39) 
+            y = random.randint(0, 39) 
+        orientacion = random.choice(orientaciones)  
         if chequear_casillas_disponibles(matriz, x, y, longitud_barco, orientacion):
-           
+            # Si puede colocar el barco, lo coloca
             if orientacion == 'horizontal':
                 for i in range(longitud_barco):
                     matriz[x][y + i] = 1
@@ -121,12 +106,12 @@ def colocar_todos_los_barcos(tablero, dificultad):
     if dificultad == "facil":
         barcos = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4 ]
     elif dificultad == "normal":
-       barcos = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4 ] * 2
+        barcos = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4 ] * 2
     elif dificultad == "dificil":
         barcos = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4 ] * 3
 
     for longitud_barco in barcos:
-        colocar_barco(tablero, longitud_barco)
+        colocar_barco(tablero, longitud_barco, dificultad)
 
 
 def mostrar_matriz(matriz:list)->None:
@@ -139,73 +124,67 @@ def mostrar_matriz(matriz:list)->None:
             print(matriz[i][j], end=" ")
         print("")
 
-def dibujar_grilla(tablero):
+def dibujar_grilla(pantalla, tablero, FILAS, COLUMNAS):
     '''
-    Dibuja la grilla del juego en la pantalla y depende del estado dibuja un color
+    Dibuja la grilla del juego en la pantalla
     '''
-
-
+    TAMANIO_CASILLA = 500// FILAS
     for fila in range(FILAS):
         for columna in range(COLUMNAS):
             x = columna * TAMANIO_CASILLA
             y = fila * TAMANIO_CASILLA
+            # Dibujar casillas según su estado
+            if tablero[fila][columna] == 2:  # Acertado
+                pygame.draw.rect(pantalla, FALLADO, (x, y, TAMANIO_CASILLA, TAMANIO_CASILLA))   
 
-            
-            if tablero[fila][columna] == 2:  
-                pantalla.blit(imagen_acierto, (x, y))  
-
-            elif tablero[fila][columna] == -1: 
-                  pass
+            elif tablero[fila][columna] == -1:  # Fallado
+                pass 
 
             else:
                 pygame.draw.rect(pantalla, GRIS, (x, y, TAMANIO_CASILLA, TAMANIO_CASILLA))  
-
-           
+            
             pygame.draw.rect(pantalla, NEGRO, (x, y, TAMANIO_CASILLA, TAMANIO_CASILLA), 1)
 
-
-
-def pantalla_juego(puntaje, tablero):
+def pantalla_juego(pantalla, puntaje, tablero, FILAS, COLUMNAS):
     '''
     Muestra la pantalla del juego (la matriz y el puntaje)
     '''
     pantalla.fill(BLANCO)
     pantalla.blit(imagen_oceano_agrandada, (0, 0))
-    dibujar_grilla(tablero)
+    dibujar_grilla(pantalla, tablero, FILAS, COLUMNAS)
 
     fuente = pygame.font.Font(None, 36)
     texto_puntaje = fuente.render(f"Puntaje: {puntaje:04d}", True, NEGRO)
-   
+    pantalla.blit(texto_puntaje, (600, 50))
+    
     puntaje_rect = pygame.Rect(580, 40, 185, 50)  # Ajusta el tamaño del rectángulo si es necesario
     pygame.draw.rect(pantalla, (255, 255, 0), puntaje_rect)
 
 
-    # boton salir 
     salir_rect = pygame.Rect(600, 550, 100, 40)
     mouse_pos = pygame.mouse.get_pos()
     texto_salir = fuente.render("Salir", True, NEGRO)
     
-    # boton reiniciar
     reiniciar_rect = pygame.Rect(600, 500, 120, 40)
     texto_reiniciar = fuente.render("Reiniciar", True, NEGRO)
 
     dibujar_rectangulo_interactivo(pantalla, salir_rect, mouse_pos, AZUL, COLOR_BOTONES)
     dibujar_rectangulo_interactivo(pantalla, reiniciar_rect, mouse_pos, AZUL, COLOR_BOTONES)
-   
+    
     pantalla.blit(texto_puntaje, (600, 50))
     pantalla.blit(texto_salir, (salir_rect.x + 20, salir_rect.y + 10))
     pantalla.blit(texto_reiniciar, (reiniciar_rect.x + 5, reiniciar_rect.y + 10))
-    
+
+
     pygame.display.flip()
     return salir_rect, reiniciar_rect
+
 
 
 
 def dibujar_rectangulo_interactivo(pantalla, rectangulo, mouse_pos, color_interactivo, color_normal, radio_borde=5):
     '''
     Hace que los botones sean interactivos: cuando se le pasa el cursor por encima se cambia de color
-    
-    
     '''
     if rectangulo.collidepoint(mouse_pos):
         color = color_interactivo 
@@ -214,16 +193,15 @@ def dibujar_rectangulo_interactivo(pantalla, rectangulo, mouse_pos, color_intera
         color = color_normal
         pygame.draw.rect(pantalla, color, rectangulo, border_radius=radio_borde)
 
+
 def menu_principal():
     '''
-    
     muestra el menu principal del juego donde el usuario puede elegir entre iniciar el juego,
     seleccionar dificultad, ver puntajes o salir.
- 
     '''
 
     seleccion = None
-
+    
     font = pygame.font.Font(None, 50)
     texto_dificultad = font.render("Dificultad", True, NEGRO)
     texto_jugar = font.render("Jugar", True, NEGRO)
@@ -246,7 +224,6 @@ def menu_principal():
         dibujar_rectangulo_interactivo(pantalla, puntajes_rect, mouse_pos, AZUL, COLOR_BOTONES)
         dibujar_rectangulo_interactivo(pantalla, salir_rect, mouse_pos, AZUL, COLOR_BOTONES)
         
-        # escribir texto sobre los botones
         pantalla.blit(texto_dificultad, (dificultad_rect.x + 40, dificultad_rect.y + 10))
         pantalla.blit(texto_jugar, (jugar_rect.x + 70, jugar_rect.y + 10))
         pantalla.blit(texto_puntajes, (puntajes_rect.x + 20, puntajes_rect.y + 10))
@@ -260,8 +237,9 @@ def menu_principal():
                 pygame.quit()
                 sys.exit()
             if evento.type == pygame.MOUSEBUTTONDOWN:
-                sonido_botones = pygame.mixer.Sound("2do_parcial_pygame.py/sonidos/sonido_boton.wav")
+                sonido_botones = pygame.mixer.Sound("sonidos\sonido_boton.wav")
                 sonido_botones.play()
+                
                 if jugar_rect.collidepoint(evento.pos):
                     seleccion = "jugar"
                 elif puntajes_rect.collidepoint(evento.pos):
@@ -276,24 +254,18 @@ def menu_principal():
 
 def detectar_clic(tablero, fila, columna, puntaje):
     '''
-     detecta si es agua o barco y actualiza el tablero y el puntaje.
+    detecta si es agua o barco y actualiza el tablero y el puntaje.
     '''
-    if tablero[fila][columna] == 1:  # barco
-        tablero[fila][columna] = 2  # si le pega 
+    if tablero[fila][columna] == 1:  # Barco
+        tablero[fila][columna] = 2  # Marcado como acertado
         puntaje += 5
-    elif tablero[fila][columna] == 0:  # agua
-        tablero[fila][columna] = -1  # si erra
+    elif tablero[fila][columna] == 0:  # Agua
+        tablero[fila][columna] = -1  # Marcado como fallado
         puntaje -= 1
     return puntaje
 
 
-def mostrar_pantalla_dificultad():
-    
-    '''
-    Muestra una pantalla con tres botones interactivos con los niveles de dificultad
-    
-    '''
-
+def mostrar_pantalla_dificultad(pantalla :pygame.surface):
     dificultad_seleccionada = None
     corriendo_dificultad = True
 
@@ -318,7 +290,7 @@ def mostrar_pantalla_dificultad():
 
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 coordenadas_click = pygame.mouse.get_pos()
-                sonido_botones = pygame.mixer.Sound("2do_parcial_pygame.py/sonidos/sonido_boton.wav")
+                sonido_botones = pygame.mixer.Sound("sonidos\sonido_boton.wav")
                 if rectangulo_facil.collidepoint(coordenadas_click):
                 
                     sonido_botones.play()
@@ -350,7 +322,7 @@ def mostrar_pantalla_dificultad():
         dibujar_rectangulo_interactivo(pantalla, rectangulo_facil, mouse_pos, AZUL, COLOR_BOTONES)
         dibujar_rectangulo_interactivo(pantalla, rectangulo_normal, mouse_pos, AZUL, COLOR_BOTONES)
         dibujar_rectangulo_interactivo(pantalla, rectangulo_dificil, mouse_pos, AZUL, COLOR_BOTONES)
-      
+    
         pantalla.blit(texto_facil, (rectangulo_facil.x + 30, rectangulo_facil.y + 10))
         pantalla.blit(texto_normal, (rectangulo_normal.x + 30, rectangulo_normal.y + 10))
         pantalla.blit(texto_dificil, (rectangulo_dificil.x + 30, rectangulo_dificil.y + 10))
@@ -358,3 +330,111 @@ def mostrar_pantalla_dificultad():
 
         pygame.display.update()
     return dificultad_seleccionada
+
+
+def mostrar_pantalla_puntajes():
+    corriendo_puntaje = True
+    rectangulo_salir = pygame.Rect(600, 550, 100, 40)
+    rectangulo_texto = pygame.Rect(250, 150, 200, 200)
+    fuente = pygame.font.Font(None, 36)
+    texto_salir = fuente.render("Salir", True, NEGRO)
+    ##########################################################################
+    lista_puntajes = leer_archivos_txt("puntaje.txt")
+        # Procesar el texto del archivo
+    diccionarios = []
+    for linea in lista_puntajes:
+
+        # Dividir cada línea por " : " para separar el nombre y el puntaje
+        nombre, puntos = linea.split(" : ")
+        diccionarios.append({"nombre": nombre, "puntaje": int(puntos)})  # Guardar como diccionario
+
+    # Ordenar los diccionarios por puntaje de mayor a menor
+
+    diccionarios_ordenados = sorted(diccionarios, key=lambda dicc: dicc['puntaje'], reverse=True)
+
+    while corriendo_puntaje == True:
+        mouse_pos = pygame.mouse.get_pos()
+
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if evento.type == pygame.MOUSEBUTTONDOWN:
+                coordenadas_click = pygame.mouse.get_pos()
+                sonido_botones = pygame.mixer.Sound("sonidos/sonido_boton.wav")
+
+                if rectangulo_salir.collidepoint(coordenadas_click):
+                    sonido_botones.play()
+                    corriendo_puntaje = False
+        pantalla.fill(NEGRO)
+        pantalla.blit(imagen_menu_agrandada, (0, 0))
+        
+        dibujar_rectangulo_interactivo(pantalla, rectangulo_salir, mouse_pos, BLANCO, COLOR_BOTONES)
+        dibujar_rectangulo_interactivo(pantalla, rectangulo_texto,mouse_pos, GRIS, BLANCO )
+        pantalla.blit(texto_salir, (rectangulo_salir.x + 20, rectangulo_salir.y + 10))
+        
+
+        y = rectangulo_texto.y + 10  # Comienza en la posición vertical de los rectángulos
+        for diccionario in diccionarios_ordenados:
+            texto_puntaje = fuente.render(f"{diccionario['nombre']}: {diccionario['puntaje']}", True, (NEGRO))  # Texto del puntaje
+            pantalla.blit(texto_puntaje, (rectangulo_texto.x + 10, y))
+            y += 40  # Espaciado entre líneas
+        
+        pygame.display.update()
+    return rectangulo_salir
+
+
+def guardar_puntaje(nombre, puntaje):
+    """Guarda el puntaje del jugador en un archivo de texto.
+    """
+    with open("puntaje.txt", "a") as archivo:
+        archivo.write(f"{nombre} : {puntaje}\n")
+
+# Función para pedir el nombre al jugador dentro de la pantalla del juego
+def pedir_nombre(pantalla, puntaje):
+    fuente = pygame.font.Font(None, 36)
+    
+    texto = fuente.render("Introduce tu Nombre:", True, NEGRO)
+    pantalla.fill(BLANCO)
+    pantalla.blit(texto, (250, 200)) 
+
+    caja_texto = pygame.Rect(250, 250, 300, 40)
+    pygame.draw.rect(pantalla, NEGRO, caja_texto, 2) 
+
+
+    nombre = ''
+    activo = True
+
+    while activo:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_RETURN:  # Cuando presiona ENTER, se guarda el nombre
+                    activo = False
+                elif evento.key == pygame.K_BACKSPACE:  # Eliminar un carácter
+                    nombre = nombre[:-1]
+                else:
+                    nombre += evento.unicode  # Agregar el carácter presionado
+
+        # Mostrar el nombre que se va escribiendo
+        texto_nombre = fuente.render(nombre, True, NEGRO)
+        pantalla.blit(texto_nombre, (caja_texto.x + 5, caja_texto.y + 5))
+
+        pygame.display.flip()
+
+    guardar_puntaje(nombre, puntaje)
+
+    pantalla.fill(BLANCO)
+    texto_guardado = fuente.render("Puntaje guardado con éxito!", True, NEGRO)
+    pantalla.blit(texto_guardado, (250, 200))
+    pygame.display.flip()
+
+def leer_archivos_txt(ruta:str):
+    with open(ruta, "r") as mi_archivo:
+        dato = mi_archivo.readlines()
+    return dato
+
