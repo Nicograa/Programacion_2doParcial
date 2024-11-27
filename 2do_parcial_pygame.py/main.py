@@ -2,8 +2,8 @@
 import pygame
 import sys
 from biblioteca import *
-import json
-import random
+
+
 
 pygame.init()
 
@@ -27,7 +27,7 @@ dificultad = "facil"
 
 
 while True:
-    seleccion = menu_principal()
+    seleccion = menu_principal(pantalla)
     
     if seleccion == "Dificultad":
         dificultad = mostrar_pantalla_dificultad(pantalla)
@@ -43,10 +43,12 @@ while True:
             FILAS = 40
             COLUMNAS = 40
             TAMANIO_CASILLA = 500// FILAS
+            
         tablero = inicializar_matriz(FILAS, COLUMNAS)
         colocar_todos_los_barcos(tablero, dificultad)
+
     if seleccion == "puntajes":
-        puntajes_personas = mostrar_pantalla_puntajes()
+        puntajes_personas = mostrar_pantalla_puntajes(pantalla)
 
     if seleccion == "jugar" :
 

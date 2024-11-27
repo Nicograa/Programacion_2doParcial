@@ -44,7 +44,7 @@ def inicializar_matriz(filas:int, columnas:int)->list:
         matriz += [fila]
     return matriz
 
-def chequear_casillas_disponibles(matriz, x, y, longitud_barco, orientacion):
+def chequear_casillas_disponibles(matriz:list, x:int, y:int, longitud_barco:int, orientacion:str)->bool:
     '''
     verifica si se puede colocar un barco en x - y, y que si no pase los limites del tablero 
     ni que haya otro barcoen las casillas
@@ -52,17 +52,17 @@ def chequear_casillas_disponibles(matriz, x, y, longitud_barco, orientacion):
     '''
     retorno = True
     if orientacion == 'horizontal':
-        if y + longitud_barco > 10:  # Verificar que el barco no se pase de los límites
+        if y + longitud_barco > 10:  #  no se pase de los límites
             retorno = False
-        # Verificar que no haya otros barcos en el camino
+        # que no haya otros barcos en el camino
         for i in range(longitud_barco):
             if y + i >=10 or matriz[x][y + i] != 0:
                 retorno = False
                 break
     elif orientacion == 'vertical':
-        if x + longitud_barco > 10:  # Verificar que el barco no se pase de los límites
+        if x + longitud_barco > 10:  
             retorno = False
-        # Verificar que no haya otros barcos en el camino
+        # no haya otros barcos en el camino
         for i in range(longitud_barco):
             if x + i >= 10 or matriz[x + i][y] != 0:
                 retorno = False
@@ -70,7 +70,10 @@ def chequear_casillas_disponibles(matriz, x, y, longitud_barco, orientacion):
     
     return retorno
 
-def colocar_barco(matriz, longitud_barco, dificultad):
+
+
+
+def colocar_barco(matriz:list, longitud_barco:int, dificultad:str)->None:
     """
     coloca un barco de longitud específica en el tablero en una posicion y orientacion aleatoria
     si no hay otro barco
@@ -98,7 +101,7 @@ def colocar_barco(matriz, longitud_barco, dificultad):
             break
 
 
-def colocar_todos_los_barcos(tablero, dificultad):
+def colocar_todos_los_barcos(tablero:list, dificultad:str)->None:
     '''
     coloca todos los barcos en el tablero
     
@@ -124,7 +127,7 @@ def mostrar_matriz(matriz:list)->None:
             print(matriz[i][j], end=" ")
         print("")
 
-def dibujar_grilla(pantalla, tablero, FILAS, COLUMNAS):
+def dibujar_grilla(pantalla:pygame.Surface, tablero:list, FILAS:int, COLUMNAS:int)->None:
     '''
     Dibuja la grilla del juego en la pantalla
     '''
@@ -145,7 +148,7 @@ def dibujar_grilla(pantalla, tablero, FILAS, COLUMNAS):
             
             pygame.draw.rect(pantalla, NEGRO, (x, y, TAMANIO_CASILLA, TAMANIO_CASILLA), 1)
 
-def pantalla_juego(pantalla, puntaje, tablero, FILAS, COLUMNAS):
+def pantalla_juego(pantalla:pygame.Surface, puntaje:int, tablero:list, FILAS:int, COLUMNAS:int):
     '''
     Muestra la pantalla del juego (la matriz y el puntaje)
     '''
@@ -182,7 +185,7 @@ def pantalla_juego(pantalla, puntaje, tablero, FILAS, COLUMNAS):
 
 
 
-def dibujar_rectangulo_interactivo(pantalla, rectangulo, mouse_pos, color_interactivo, color_normal, radio_borde=5):
+def dibujar_rectangulo_interactivo(pantalla:pygame.Surface, rectangulo:pygame.Rect, mouse_pos:int, color_interactivo:int, color_normal:int, radio_borde=5)->None:
     '''
     Hace que los botones sean interactivos: cuando se le pasa el cursor por encima se cambia de color
     '''
@@ -194,7 +197,7 @@ def dibujar_rectangulo_interactivo(pantalla, rectangulo, mouse_pos, color_intera
         pygame.draw.rect(pantalla, color, rectangulo, border_radius=radio_borde)
 
 
-def menu_principal():
+def menu_principal(pantalla: pygame.Surface)->str:
     '''
     muestra el menu principal del juego donde el usuario puede elegir entre iniciar el juego,
     seleccionar dificultad, ver puntajes o salir.
@@ -252,9 +255,9 @@ def menu_principal():
         return seleccion
         
 
-def detectar_clic(tablero, fila, columna, puntaje):
+def detectar_clic(tablero:list, fila:int, columna:int, puntaje:int)->int:
     '''
-    detecta si es agua o barco y actualiza el tablero y el puntaje.
+    detecta si es agua o barco, actualiza el tablero y ajusta el puntaje.
     '''
     if tablero[fila][columna] == 1:  # Barco
         tablero[fila][columna] = 2  # Marcado como acertado
@@ -265,7 +268,13 @@ def detectar_clic(tablero, fila, columna, puntaje):
     return puntaje
 
 
-def mostrar_pantalla_dificultad(pantalla :pygame.surface):
+def mostrar_pantalla_dificultad(pantalla :pygame.surface)->str:
+    '''
+    Muestra una pantalla para que el usuario seleccione la dificultad del juego
+    
+    
+    '''
+
     dificultad_seleccionada = None
     corriendo_dificultad = True
 
@@ -332,24 +341,29 @@ def mostrar_pantalla_dificultad(pantalla :pygame.surface):
     return dificultad_seleccionada
 
 
-def mostrar_pantalla_puntajes():
+def mostrar_pantalla_puntajes(pantalla: pygame.Surface):
+    '''
+     Muestra una pantalla con los puntajes guardados de mayor a menor y un botón para salir.
+    
+    '''
+    
+    
     corriendo_puntaje = True
     rectangulo_salir = pygame.Rect(600, 550, 100, 40)
     rectangulo_texto = pygame.Rect(250, 150, 200, 200)
     fuente = pygame.font.Font(None, 36)
     texto_salir = fuente.render("Salir", True, NEGRO)
-    ##########################################################################
-    lista_puntajes = leer_archivos_txt("puntaje.txt")
-        # Procesar el texto del archivo
-    diccionarios = []
-    for linea in lista_puntajes:
+   
 
-        # Dividir cada línea por " : " para separar el nombre y el puntaje
+    lista_puntajes = leer_archivos_txt("puntaje.txt")
+       
+    diccionarios = []
+
+    for linea in lista_puntajes:
         nombre, puntos = linea.split(" : ")
-        diccionarios.append({"nombre": nombre, "puntaje": int(puntos)})  # Guardar como diccionario
+        diccionarios.append({"nombre": nombre, "puntaje": int(puntos)})  
 
     # Ordenar los diccionarios por puntaje de mayor a menor
-
     diccionarios_ordenados = sorted(diccionarios, key=lambda dicc: dicc['puntaje'], reverse=True)
 
     while corriendo_puntaje == True:
@@ -375,24 +389,31 @@ def mostrar_pantalla_puntajes():
         pantalla.blit(texto_salir, (rectangulo_salir.x + 20, rectangulo_salir.y + 10))
         
 
-        y = rectangulo_texto.y + 10  # Comienza en la posición vertical de los rectángulos
+        y = rectangulo_texto.y + 10  
         for diccionario in diccionarios_ordenados:
-            texto_puntaje = fuente.render(f"{diccionario['nombre']}: {diccionario['puntaje']}", True, (NEGRO))  # Texto del puntaje
+            texto_puntaje = fuente.render(f"{diccionario['nombre']}: {diccionario['puntaje']}", True, (NEGRO))  
             pantalla.blit(texto_puntaje, (rectangulo_texto.x + 10, y))
-            y += 40  # Espaciado entre líneas
+            y += 40  
         
         pygame.display.update()
     return rectangulo_salir
 
 
-def guardar_puntaje(nombre, puntaje):
-    """Guarda el puntaje del jugador en un archivo de texto.
-    """
+def guardar_puntaje(nombre:str, puntaje:int)->None:
+    '''
+    Guarda el puntaje del jugador en un archivo de texto
+    '''
     with open("puntaje.txt", "a") as archivo:
         archivo.write(f"{nombre} : {puntaje}\n")
 
-# Función para pedir el nombre al jugador dentro de la pantalla del juego
-def pedir_nombre(pantalla, puntaje):
+
+def pedir_nombre(pantalla: pygame.Surface, puntaje:int)->None:
+    '''
+    Muestra una interfaz gráfica para que el usuario ingrese su nombre y guarda su puntaje.
+
+    
+    
+    '''
     fuente = pygame.font.Font(None, 36)
     
     texto = fuente.render("Introduce tu Nombre:", True, NEGRO)
@@ -420,7 +441,7 @@ def pedir_nombre(pantalla, puntaje):
                 else:
                     nombre += evento.unicode  # Agregar el carácter presionado
 
-        # Mostrar el nombre que se va escribiendo
+        
         texto_nombre = fuente.render(nombre, True, NEGRO)
         pantalla.blit(texto_nombre, (caja_texto.x + 5, caja_texto.y + 5))
 
@@ -433,7 +454,11 @@ def pedir_nombre(pantalla, puntaje):
     pantalla.blit(texto_guardado, (250, 200))
     pygame.display.flip()
 
-def leer_archivos_txt(ruta:str):
+def leer_archivos_txt(ruta:str)->list:
+    '''
+    Lee el contenido de un archivo de texto
+    
+    '''
     with open(ruta, "r") as mi_archivo:
         dato = mi_archivo.readlines()
     return dato
