@@ -4,7 +4,6 @@ import sys
 from biblioteca import *
 
 
-
 pygame.init()
 
 
@@ -14,10 +13,11 @@ pygame.display.set_caption("Batalla Naval")
 pygame.display.set_icon(imagen_icono)
 
 
-pygame.mixer.music.load("sonidos\sonido_menuu.wav")
-pygame.mixer.music.set_volume(0.5)  # 0 - 1 -> 0.2 es el 20% del volumen
+pygame.mixer.music.load("sonidos/sonido_menuu.wav")
+pygame.mixer.music.set_volume(0.2)  
 pygame.mixer.music.play(-1, 0.0)
-sonido_clic_juego = pygame.mixer.Sound("sonidos\sonido_cañones.wav")
+sonido_clic_juego = pygame.mixer.Sound("sonidos/sonido_cañones.wav")
+pygame.mixer.Sound.set_volume((sonido_clic_juego), 0.2)
 
 
 
@@ -43,17 +43,15 @@ while True:
             FILAS = 40
             COLUMNAS = 40
             TAMANIO_CASILLA = 500// FILAS
-            
         tablero = inicializar_matriz(FILAS, COLUMNAS)
         colocar_todos_los_barcos(tablero, dificultad)
-
     if seleccion == "puntajes":
         puntajes_personas = mostrar_pantalla_puntajes(pantalla)
 
     if seleccion == "jugar" :
 
         pygame.mixer.music.stop()  
-        pygame.mixer.music.load("sonidos\sonido_oceano.mp3")
+        pygame.mixer.music.load("sonidos/sonido_oceano.mp3")
         pygame.mixer.music.set_volume(1)  
         pygame.mixer.music.play(-1, 0.0) 
 

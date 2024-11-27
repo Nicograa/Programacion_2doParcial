@@ -1,6 +1,7 @@
 import pygame
 import sys 
 import random
+
 #tamaño de pantalla
 ANCHO = 800
 ALTO = 600
@@ -28,8 +29,8 @@ imagen_icono = pygame.image.load("imagenes\imagen_icono.jpg")
 imagen_acierto = pygame.image.load("imagenes\explosion.png")
 
 imagen_acierto = pygame.transform.scale(imagen_acierto, (TAMANIO_CASILLA, TAMANIO_CASILLA))
-imagen_menu_agrandada = pygame.transform.scale(imagen_menu, (800, 600))
-imagen_oceano_agrandada = pygame.transform.scale(imagen_oceano, (800, 600))
+imagen_menu_agrandada = pygame.transform.scale(imagen_menu, (ANCHO, ALTO))
+imagen_oceano_agrandada = pygame.transform.scale(imagen_oceano, (ANCHO, ALTO))
 
 
 def inicializar_matriz(filas:int, columnas:int)->list:
@@ -52,9 +53,8 @@ def chequear_casillas_disponibles(matriz:list, x:int, y:int, longitud_barco:int,
     '''
     retorno = True
     if orientacion == 'horizontal':
-        if y + longitud_barco > 10:  #  no se pase de los límites
+        if y + longitud_barco > 10:  
             retorno = False
-        # que no haya otros barcos en el camino
         for i in range(longitud_barco):
             if y + i >=10 or matriz[x][y + i] != 0:
                 retorno = False
@@ -62,16 +62,12 @@ def chequear_casillas_disponibles(matriz:list, x:int, y:int, longitud_barco:int,
     elif orientacion == 'vertical':
         if x + longitud_barco > 10:  
             retorno = False
-        # no haya otros barcos en el camino
         for i in range(longitud_barco):
             if x + i >= 10 or matriz[x + i][y] != 0:
                 retorno = False
                 break
     
     return retorno
-
-
-
 
 def colocar_barco(matriz:list, longitud_barco:int, dificultad:str)->None:
     """
@@ -91,7 +87,7 @@ def colocar_barco(matriz:list, longitud_barco:int, dificultad:str)->None:
             y = random.randint(0, 39) 
         orientacion = random.choice(orientaciones)  
         if chequear_casillas_disponibles(matriz, x, y, longitud_barco, orientacion):
-            # Si puede colocar el barco, lo coloca
+
             if orientacion == 'horizontal':
                 for i in range(longitud_barco):
                     matriz[x][y + i] = 1
@@ -112,20 +108,10 @@ def colocar_todos_los_barcos(tablero:list, dificultad:str)->None:
         barcos = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4 ] * 2
     elif dificultad == "dificil":
         barcos = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4 ] * 3
-    
+
     for longitud_barco in barcos:
         colocar_barco(tablero, longitud_barco, dificultad)
 
-
-def mostrar_matriz(matriz:list)->None:
-    '''
-    Recibe una matriz por parámetro
-    La imprime
-    '''
-    for i in range(len(matriz)):
-        for j in range(len(matriz[i])):
-            print(matriz[i][j], end=" ")
-        print("")
 
 def dibujar_grilla(pantalla:pygame.Surface, tablero:list, FILAS:int, COLUMNAS:int)->None:
     '''
@@ -136,8 +122,8 @@ def dibujar_grilla(pantalla:pygame.Surface, tablero:list, FILAS:int, COLUMNAS:in
         for columna in range(COLUMNAS):
             x = columna * TAMANIO_CASILLA
             y = fila * TAMANIO_CASILLA
-            # dibujar casillas según su estado
-            if tablero[fila][columna] == 2:  
+
+            if tablero[fila][columna] == 2: 
                 pygame.draw.rect(pantalla, FALLADO, (x, y, TAMANIO_CASILLA, TAMANIO_CASILLA))   
 
             elif tablero[fila][columna] == -1: 
@@ -160,9 +146,8 @@ def pantalla_juego(pantalla:pygame.Surface, puntaje:int, tablero:list, FILAS:int
     texto_puntaje = fuente.render(f"Puntaje: {puntaje:04d}", True, NEGRO)
     pantalla.blit(texto_puntaje, (600, 50))
     
-    puntaje_rect = pygame.Rect(580, 40, 185, 50) 
+    puntaje_rect = pygame.Rect(580, 40, 185, 50)  
     pygame.draw.rect(pantalla, (255, 255, 0), puntaje_rect)
-
 
     salir_rect = pygame.Rect(600, 550, 100, 40)
     mouse_pos = pygame.mouse.get_pos()
@@ -257,24 +242,21 @@ def menu_principal(pantalla: pygame.Surface)->str:
 
 def detectar_clic(tablero:list, fila:int, columna:int, puntaje:int)->int:
     '''
-    detecta si es agua o barco, actualiza el tablero y ajusta el puntaje.
+    detecta si es agua o barco y actualiza el tablero y el puntaje.
     '''
-    if tablero[fila][columna] == 1:  # barco
-        tablero[fila][columna] = 2  # cuando le pega
+    if tablero[fila][columna] == 1: 
+        tablero[fila][columna] = 2  
         puntaje += 5
-    elif tablero[fila][columna] == 0:  # agua
-        tablero[fila][columna] = -1  # cuando erra
+    elif tablero[fila][columna] == 0: 
+        tablero[fila][columna] = -1  
         puntaje -= 1
     return puntaje
 
 
 def mostrar_pantalla_dificultad(pantalla :pygame.surface)->str:
     '''
-    Muestra una pantalla para que el usuario seleccione la dificultad del juego
-    
-    
+    Muestra una pantalla para seleccionar
     '''
-
     dificultad_seleccionada = None
     corriendo_dificultad = True
 
@@ -283,7 +265,6 @@ def mostrar_pantalla_dificultad(pantalla :pygame.surface)->str:
     rectangulo_dificil = pygame.Rect(270, 220, 200, 50)
 
     fuente = pygame.font.Font(None, 50)
-    texto_dificultad = fuente.render("Dificultad", True, NEGRO)
     texto_facil = fuente.render("Fácil", True, NEGRO)
     texto_normal = fuente.render("Normal", True, NEGRO)
     texto_dificil = fuente.render("Difícil", True, NEGRO)
@@ -341,29 +322,21 @@ def mostrar_pantalla_dificultad(pantalla :pygame.surface)->str:
     return dificultad_seleccionada
 
 
-def mostrar_pantalla_puntajes(pantalla: pygame.Surface):
-    '''
-     Muestra una pantalla con los puntajes guardados de mayor a menor y un botón para salir.
-    
-    '''
-    
-    
+def mostrar_pantalla_puntajes(pantalla:pygame.Surface):
     corriendo_puntaje = True
     rectangulo_salir = pygame.Rect(600, 550, 100, 40)
     rectangulo_texto = pygame.Rect(250, 150, 200, 200)
     fuente = pygame.font.Font(None, 36)
     texto_salir = fuente.render("Salir", True, NEGRO)
-   
 
     lista_puntajes = leer_archivos_txt("puntaje.txt")
-       
     diccionarios = []
-
     for linea in lista_puntajes:
+
         nombre, puntos = linea.split(" : ")
         diccionarios.append({"nombre": nombre, "puntaje": int(puntos)})  
 
-# metodo de burbujeo para ordenar los puntajes
+    # metodo de burbujeo para ordenar los puntajes
     largo_lista_dicc = len(diccionarios)
     for i in range(largo_lista_dicc):
         for j in range(0, largo_lista_dicc - i - 1):
@@ -380,7 +353,7 @@ def mostrar_pantalla_puntajes(pantalla: pygame.Surface):
 
             if evento.type == pygame.MOUSEBUTTONDOWN:
                 coordenadas_click = pygame.mouse.get_pos()
-                sonido_botones = pygame.mixer.Sound("sonidos/sonido_boton.wav")
+                sonido_botones = pygame.mixer.Sound("sonidos\sonido_boton.wav")
 
                 if rectangulo_salir.collidepoint(coordenadas_click):
                     sonido_botones.play()
@@ -395,28 +368,25 @@ def mostrar_pantalla_puntajes(pantalla: pygame.Surface):
 
         y = rectangulo_texto.y + 10  
         for diccionario in diccionarios:
-            texto_puntaje = fuente.render(f"{diccionario['nombre']}: {diccionario['puntaje']}", True, (NEGRO))  
+            texto_puntaje = fuente.render(f"{diccionario['nombre']}: {diccionario['puntaje']}", True, (NEGRO))  # Texto del puntaje
             pantalla.blit(texto_puntaje, (rectangulo_texto.x + 10, y))
-            y += 40  
+            y += 40 
         
         pygame.display.update()
     return rectangulo_salir
 
 
 def guardar_puntaje(nombre:str, puntaje:int)->None:
-    '''
-    Guarda el puntaje del jugador en un archivo de texto
-    '''
+    """
+    Guarda el puntaje del jugador en un archivo de texto.
+    """
     with open("puntaje.txt", "a") as archivo:
         archivo.write(f"{nombre} : {puntaje}\n")
 
 
-def pedir_nombre(pantalla: pygame.Surface, puntaje:int)->None:
+def pedir_nombre(pantalla:pygame.Surface, puntaje:int):
     '''
-    Muestra una interfaz gráfica para que el usuario ingrese su nombre y guarda su puntaje.
-
-    
-    
+    Muestra una pantalla que le pide el nombre el usuario
     '''
     fuente = pygame.font.Font(None, 36)
     
@@ -438,14 +408,13 @@ def pedir_nombre(pantalla: pygame.Surface, puntaje:int)->None:
                 sys.exit()
 
             if evento.type == pygame.KEYDOWN:
-                if evento.key == pygame.K_RETURN:  # Cuando presiona enter se guarda el nombre
+                if evento.key == pygame.K_RETURN:  
                     activo = False
-                elif evento.key == pygame.K_BACKSPACE:  # eliminar un caracter
+                elif evento.key == pygame.K_BACKSPACE:  
                     nombre = nombre[:-1]
                 else:
-                    nombre += evento.unicode  #agrega la tecla presionada
+                    nombre += evento.unicode 
 
-        
         texto_nombre = fuente.render(nombre, True, NEGRO)
         pantalla.blit(texto_nombre, (caja_texto.x + 5, caja_texto.y + 5))
 
@@ -460,8 +429,7 @@ def pedir_nombre(pantalla: pygame.Surface, puntaje:int)->None:
 
 def leer_archivos_txt(ruta:str)->list:
     '''
-    Lee el contenido de un archivo de texto
-    
+    Lee un archivo con formato texto con el metodo .readlines()
     '''
     with open(ruta, "r") as mi_archivo:
         dato = mi_archivo.readlines()
