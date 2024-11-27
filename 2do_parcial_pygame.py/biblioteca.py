@@ -423,8 +423,6 @@ def pedir_nombre(pantalla:pygame.Surface, puntaje:int):
     guardar_puntaje(nombre, puntaje)
 
     pantalla.fill(BLANCO)
-    texto_guardado = fuente.render("Puntaje guardado con éxito!", True, NEGRO)
-    pantalla.blit(texto_guardado, (250, 200))
     pygame.display.flip()
 
 def leer_archivos_txt(ruta:str)->list:
