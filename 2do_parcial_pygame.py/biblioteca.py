@@ -112,7 +112,7 @@ def colocar_todos_los_barcos(tablero:list, dificultad:str)->None:
         barcos = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4 ] * 2
     elif dificultad == "dificil":
         barcos = [1, 1, 1, 1, 2, 2, 2, 3, 3, 4 ] * 3
-
+    
     for longitud_barco in barcos:
         colocar_barco(tablero, longitud_barco, dificultad)
 
@@ -136,11 +136,11 @@ def dibujar_grilla(pantalla:pygame.Surface, tablero:list, FILAS:int, COLUMNAS:in
         for columna in range(COLUMNAS):
             x = columna * TAMANIO_CASILLA
             y = fila * TAMANIO_CASILLA
-            # Dibujar casillas según su estado
-            if tablero[fila][columna] == 2:  # Acertado
+            # dibujar casillas según su estado
+            if tablero[fila][columna] == 2:  
                 pygame.draw.rect(pantalla, FALLADO, (x, y, TAMANIO_CASILLA, TAMANIO_CASILLA))   
 
-            elif tablero[fila][columna] == -1:  # Fallado
+            elif tablero[fila][columna] == -1: 
                 pass 
 
             else:
@@ -160,7 +160,7 @@ def pantalla_juego(pantalla:pygame.Surface, puntaje:int, tablero:list, FILAS:int
     texto_puntaje = fuente.render(f"Puntaje: {puntaje:04d}", True, NEGRO)
     pantalla.blit(texto_puntaje, (600, 50))
     
-    puntaje_rect = pygame.Rect(580, 40, 185, 50)  # Ajusta el tamaño del rectángulo si es necesario
+    puntaje_rect = pygame.Rect(580, 40, 185, 50) 
     pygame.draw.rect(pantalla, (255, 255, 0), puntaje_rect)
 
 
@@ -259,11 +259,11 @@ def detectar_clic(tablero:list, fila:int, columna:int, puntaje:int)->int:
     '''
     detecta si es agua o barco, actualiza el tablero y ajusta el puntaje.
     '''
-    if tablero[fila][columna] == 1:  # Barco
-        tablero[fila][columna] = 2  # Marcado como acertado
+    if tablero[fila][columna] == 1:  # barco
+        tablero[fila][columna] = 2  # cuando le pega
         puntaje += 5
-    elif tablero[fila][columna] == 0:  # Agua
-        tablero[fila][columna] = -1  # Marcado como fallado
+    elif tablero[fila][columna] == 0:  # agua
+        tablero[fila][columna] = -1  # cuando erra
         puntaje -= 1
     return puntaje
 
@@ -363,8 +363,12 @@ def mostrar_pantalla_puntajes(pantalla: pygame.Surface):
         nombre, puntos = linea.split(" : ")
         diccionarios.append({"nombre": nombre, "puntaje": int(puntos)})  
 
-    # Ordenar los diccionarios por puntaje de mayor a menor
-    diccionarios_ordenados = sorted(diccionarios, key=lambda dicc: dicc['puntaje'], reverse=True)
+# metodo de burbujeo para ordenar los puntajes
+    largo_lista_dicc = len(diccionarios)
+    for i in range(largo_lista_dicc):
+        for j in range(0, largo_lista_dicc - i - 1):
+            if diccionarios[j]["puntaje"] < diccionarios[j+1]["puntaje"]:
+                diccionarios[j], diccionarios[j+1] = diccionarios[j+1], diccionarios[j]
 
     while corriendo_puntaje == True:
         mouse_pos = pygame.mouse.get_pos()
@@ -390,7 +394,7 @@ def mostrar_pantalla_puntajes(pantalla: pygame.Surface):
         
 
         y = rectangulo_texto.y + 10  
-        for diccionario in diccionarios_ordenados:
+        for diccionario in diccionarios:
             texto_puntaje = fuente.render(f"{diccionario['nombre']}: {diccionario['puntaje']}", True, (NEGRO))  
             pantalla.blit(texto_puntaje, (rectangulo_texto.x + 10, y))
             y += 40  
@@ -434,12 +438,12 @@ def pedir_nombre(pantalla: pygame.Surface, puntaje:int)->None:
                 sys.exit()
 
             if evento.type == pygame.KEYDOWN:
-                if evento.key == pygame.K_RETURN:  # Cuando presiona ENTER, se guarda el nombre
+                if evento.key == pygame.K_RETURN:  # Cuando presiona enter se guarda el nombre
                     activo = False
-                elif evento.key == pygame.K_BACKSPACE:  # Eliminar un carácter
+                elif evento.key == pygame.K_BACKSPACE:  # eliminar un caracter
                     nombre = nombre[:-1]
                 else:
-                    nombre += evento.unicode  # Agregar el carácter presionado
+                    nombre += evento.unicode  #agrega la tecla presionada
 
         
         texto_nombre = fuente.render(nombre, True, NEGRO)
@@ -462,4 +466,3 @@ def leer_archivos_txt(ruta:str)->list:
     with open(ruta, "r") as mi_archivo:
         dato = mi_archivo.readlines()
     return dato
-
